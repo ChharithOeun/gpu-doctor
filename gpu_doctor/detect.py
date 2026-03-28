@@ -1,5 +1,5 @@
 """
-gpu_doctor.detect — Core detection logic.
+gpu_doctor.detect - Core detection logic.
 
 Detection priority (matches real-world performance for each platform):
   Windows : DirectML > CUDA > CPU
@@ -7,7 +7,7 @@ Detection priority (matches real-world performance for each platform):
   macOS   : MPS > CPU
 
 HSA_OVERRIDE_GFX_VERSION is set automatically for known unsupported GPUs
-(gfx1010 family — RX 5700 XT, RX 5700, RX 5600 XT) before torch imports.
+(gfx1010 family - RX 5700 XT, RX 5700, RX 5600 XT) before torch imports.
 This is the #1 reason AMD GPU users get silent CPU fallback on ROCm.
 """
 
@@ -21,7 +21,7 @@ from typing import Optional
 
 OS = platform.system()   # 'Windows', 'Linux', 'Darwin'
 
-# ── GFX override map ─────────────────────────────────────────────────────────
+# -- GFX override map ---------------------------------------------------------
 # Maps GPU architecture IDs to the HSA_OVERRIDE_GFX_VERSION needed for ROCm.
 # These GPUs are NOT in ROCm's default hardware allow-list.
 GFX_OVERRIDE_MAP = {
@@ -32,7 +32,7 @@ GFX_OVERRIDE_MAP = {
     "gfx900":  "9.0.0",    # Vega 10: RX Vega 56/64
 }
 
-# ── Detect GPU arch from rocminfo ─────────────────────────────────────────────
+# -- Detect GPU arch from rocminfo ---------------------------------------------
 def _detect_rocm_gfx() -> Optional[str]:
     """Return gfx architecture string from rocminfo, e.g. 'gfx1010'."""
     if not shutil.which("rocminfo"):
@@ -47,7 +47,7 @@ def _detect_rocm_gfx() -> Optional[str]:
 
 def _apply_gfx_override(gfx: Optional[str]) -> Optional[str]:
     """
-    If the detected GPU needs an HSA override, set it in os.environ NOW —
+    If the detected GPU needs an HSA override, set it in os.environ NOW -
     before torch or jax imports. Returns the version string set, or None.
     """
     if not gfx:
@@ -59,7 +59,7 @@ def _apply_gfx_override(gfx: Optional[str]) -> Optional[str]:
     return os.environ.get("HSA_OVERRIDE_GFX_VERSION")
 
 
-# ── Main device detection ─────────────────────────────────────────────────────
+# -- Main device detection -----------------------------------------------------
 def get_best_device() -> str:
     """
     Detect the best available compute device.
@@ -74,7 +74,7 @@ def get_best_device() -> str:
         from gpu_doctor import get_best_device
         device_type = get_best_device()   # 'rocm', 'directml', etc.
     """
-    # ── Windows: DirectML first ───────────────────────────────────────────────
+    # -- Windows: DirectML first -----------------------------------------------
     if OS == "Windows":
         try:
             import torch_directml  # noqa: F401
@@ -82,7 +82,7 @@ def get_best_device() -> str:
         except ImportError:
             pass
 
-    # ── ROCm / CUDA (via torch.cuda) ─────────────────────────────────────────
+    # -- ROCm / CUDA (via torch.cuda) -----------------------------------------
     # Apply GFX override BEFORE importing torch so the env var is in place
     gfx = _detect_rocm_gfx()
     _apply_gfx_override(gfx)
@@ -92,7 +92,7 @@ def get_best_device() -> str:
         if torch.cuda.is_available():
             hip = getattr(torch.version, "hip", None)
             return "rocm" if hip else "cuda"
-        # MPS — Apple Silicon
+        # MPS - Apple Silicon
         if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
             return "mps"
     except ImportError:
@@ -136,7 +136,7 @@ def get_dtype(device_type: Optional[str] = None):
     """
     Return the recommended dtype for your backend.
 
-    DirectML float16 is unreliable on most cards — returns float32.
+    DirectML float16 is unreliable on most cards - returns float32.
     Everything else returns float16.
 
     Example:
@@ -151,7 +151,7 @@ def get_dtype(device_type: Optional[str] = None):
     return torch.float16
 
 
-# ── JAX ───────────────────────────────────────────────────────────────────────
+# -- JAX -----------------------------------------------------------------------
 def get_jax_backend() -> str:
     """
     Return JAX backend string: 'gpu' | 'cpu'.
@@ -180,11 +180,11 @@ def configure_jax_amd(gfx_version: Optional[str] = None):
     Must be called BEFORE importing jax.
 
     Sets:
-      XLA_FLAGS                  — disables Triton GEMM (causes NaN on AMD)
-      MIOPEN_USER_DB_PATH        — writable MIOpen cache (avoids permission errors)
-      JAX_COMPILATION_CACHE_DIR  — XLA compilation cache
-      HIP_VISIBLE_DEVICES        — restrict to GPU 0
-      HSA_OVERRIDE_GFX_VERSION   — for unsupported GPU architectures (gfx1010, etc.)
+      XLA_FLAGS                  - disables Triton GEMM (causes NaN on AMD)
+      MIOPEN_USER_DB_PATH        - writable MIOpen cache (avoids permission errors)
+      JAX_COMPILATION_CACHE_DIR  - XLA compilation cache
+      HIP_VISIBLE_DEVICES        - restrict to GPU 0
+      HSA_OVERRIDE_GFX_VERSION   - for unsupported GPU architectures (gfx1010, etc.)
 
     Args:
         gfx_version: Override string like "10.3.0". If None, auto-detects from rocminfo.
@@ -216,13 +216,13 @@ def configure_jax_amd(gfx_version: Optional[str] = None):
     os.makedirs(os.environ["JAX_COMPILATION_CACHE_DIR"], exist_ok=True)
 
 
-# ── Diagnostics ───────────────────────────────────────────────────────────────
+# -- Diagnostics ---------------------------------------------------------------
 def device_info() -> dict:
     """
     Return a full diagnostic dictionary.
 
     Useful for logging, bug reports, and --check mode.
-    All values are strings or None — safe to serialize to JSON.
+    All values are strings or None - safe to serialize to JSON.
     """
     info: dict = {
         "gpu_doctor_version": "1.0.0",
@@ -295,7 +295,7 @@ def check_env(verbose: bool = True) -> dict:
 
     W = 66
     print("=" * W)
-    print("  gpu-doctor — Environment Report")
+    print("  gpu-doctor - Environment Report")
     print("=" * W)
     print(f"  gpu-doctor : v{info.get('gpu_doctor_version', '?')}")
     print(f"  Python     : {info['python_version']}")
@@ -321,7 +321,7 @@ def check_env(verbose: bool = True) -> dict:
             if dv:
                 print(f"  DirectML   : {dv}  ({info.get('directml_gpu_name')})")
             else:
-                print("  DirectML   : not installed  (pip install torch-directml, Python ≤ 3.11)")
+                print("  DirectML   : not installed  (pip install torch-directml, Python <= 3.11)")
     else:
         print("  torch      : NOT INSTALLED")
         _print_install_hint()
@@ -329,7 +329,7 @@ def check_env(verbose: bool = True) -> dict:
     # JAX
     jv = info.get("jax_version")
     if jv:
-        print(f"  JAX        : {jv}  →  {info.get('jax_backend', '?')}")
+        print(f"  JAX        : {jv}  ->  {info.get('jax_backend', '?')}")
     else:
         print("  JAX        : not installed  (pip install jax)")
 
@@ -352,7 +352,7 @@ def check_env(verbose: bool = True) -> dict:
 
     print()
     best = info.get("best_device", "cpu")
-    print(f"  Best device: {best}  ← use this")
+    print(f"  Best device: {best}  <- use this")
     print("=" * W)
 
     return info
