@@ -6,6 +6,12 @@ Auto-updated by GitHub Actions on every push to `main`.
 
 ---
 
+## [Unreleased] — updated 2026-03-28
+
+### Fixed
+- replace all non-ASCII chars in detect.py (Windows CI encoding bug) (`02f1719`)
+
+
 ## [1.0.0] — 2026-03-28
 
 ### Added
