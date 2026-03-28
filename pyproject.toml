@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gpu-doctor"
+version = "1.0.0"
+description = "Universal GPU setup and diagnostics for PyTorch and JAX — DirectML, ROCm, CUDA, MPS, CPU. Auto-detects your hardware and sets HSA_OVERRIDE_GFX_VERSION for unsupported AMD GPUs."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+keywords = [
+    "AMD", "GPU", "ROCm", "DirectML", "CUDA", "MPS", "PyTorch",
+    "JAX", "gfx1010", "RX5700XT", "HSA_OVERRIDE_GFX_VERSION",
+    "get_best_device", "cross-platform", "device-detection",
+    "torch-directml", "Apple-Silicon", "Windows", "Linux", "macOS",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Hardware",
+]
+dependencies = []   # zero required deps — torch/jax are optional
+
+[project.optional-dependencies]
+torch  = ["torch"]
+jax    = ["jax"]
+all    = ["torch", "jax", "optax", "flax"]
+
+[project.scripts]
+gpu-doctor = "gpu_doctor.__main__:main"
+
+[project.urls]
+Homepage      = "https://github.com/ChharithOeun/gpu-doctor"
+Documentation = "https://github.com/ChharithOeun/gpu-doctor#readme"
+Issues        = "https://github.com/ChharithOeun/gpu-doctor/issues"
+"torch-amd-setup" = "https://github.com/ChharithOeun/torch-amd-setup"
+"directml-benchmark" = "https://github.com/ChharithOeun/directml-benchmark"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gpu_doctor"]
