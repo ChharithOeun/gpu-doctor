@@ -1,0 +1,100 @@
+name: CI — Cross-Platform
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run every Monday at 08:00 UTC — catches upstream breakage
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: "${{ matrix.os }} / Python ${{ matrix.python }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install gpu-doctor (no extras)
+        run: pip install -e .
+
+      - name: Basic import check
+        run: |
+          python -c "
+          import gpu_doctor
+          from gpu_doctor import get_best_device, get_torch_device, get_dtype, device_info
+          print('Import OK — gpu_doctor version:', getattr(gpu_doctor, '__version__', 'n/a'))
+          "
+
+      - name: CLI --json (no torch)
+        run: python -m gpu_doctor --json
+
+      - name: CLI --check (no torch)
+        run: python -m gpu_doctor --check
+
+      - name: Install CPU torch
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: CLI --check (with torch)
+        run: python -m gpu_doctor --check
+
+      - name: get_best_device() with CPU torch
+        run: |
+          python -c "
+          from gpu_doctor import get_best_device, get_torch_device, get_dtype
+          import torch
+
+          device_type = get_best_device()
+          print('Best device:', device_type)
+          assert device_type in ('directml','rocm','cuda','mps','cpu'), f'Unexpected: {device_type}'
+
+          device = get_torch_device(device_type)
+          print('Torch device:', device)
+
+          dtype = get_dtype(device_type)
+          print('dtype:', dtype)
+
+          # Verify tensor works
+          t = torch.randn(4, 4).to(device).to(dtype)
+          print('Tensor OK:', t.shape, t.dtype, t.device)
+          "
+
+      - name: device_info() JSON serializable
+        run: |
+          python -c "
+          import json
+          from gpu_doctor import device_info
+          info = device_info()
+          json_str = json.dumps(info)
+          print('device_info JSON OK — keys:', list(info.keys()))
+          "
+
+  # Separate job: verify pyproject.toml builds cleanly
+  build:
+    name: "Build distribution"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install build
+      - run: python -m build
+      - name: Check dist contents
+        run: |
+          ls -lh dist/
+          pip install dist/*.whl
+          python -m gpu_doctor --json
