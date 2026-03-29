@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.png" alt="GPU Doctor Banner" width="100%"></p>
+
 # gpu-doctor
 
 **Universal GPU setup and diagnostics for PyTorch and JAX.**
