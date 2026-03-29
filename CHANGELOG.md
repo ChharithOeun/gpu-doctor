@@ -6,10 +6,10 @@ Auto-updated by GitHub Actions on every push to `main`.
 
 ---
 
-## [Unreleased] — updated 2026-03-28
+## [Unreleased] — updated 2026-03-29
 
-### Fixed
-- replace all non-ASCII chars in detect.py (Windows CI encoding bug) (`02f1719`)
+### Changed
+- Add neon banner (`fc8bae1`)
 
 
 ## [1.0.0] — 2026-03-28
