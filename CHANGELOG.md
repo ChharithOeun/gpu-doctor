@@ -6,10 +6,10 @@ Auto-updated by GitHub Actions on every push to `main`.
 
 ---
 
-## [Unreleased] — updated 2026-03-29
+## [Unreleased] -- updated 2026-04-19
 
-### Changed
-- Add neon banner (`fc8bae1`)
+### Fixed
+- strip non-ASCII bytes from workflow YAML (GitHub parse error) (`7c56e95`)
 
 
 ## [1.0.0] — 2026-03-28
