@@ -8,8 +8,8 @@ Auto-updated by GitHub Actions on every push to `main`.
 
 ## [Unreleased] -- updated 2026-04-19
 
-### Fixed
-- strip non-ASCII bytes from workflow YAML (GitHub parse error) (`7c56e95`)
+### Changed
+- add Buy Me A Coffee link to README (`63b34e2`)
 
 
 ## [1.0.0] — 2026-03-28
