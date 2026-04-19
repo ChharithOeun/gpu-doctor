@@ -1,4 +1,4 @@
-name: CI — Cross-Platform
+name: CI -- Cross-Platform
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # Run every Monday at 08:00 UTC — catches upstream breakage
+    # Run every Monday at 08:00 UTC -- catches upstream breakage
     - cron: "0 8 * * 1"
   workflow_dispatch:
 
@@ -36,7 +36,7 @@ jobs:
           python -c "
           import gpu_doctor
           from gpu_doctor import get_best_device, get_torch_device, get_dtype, device_info
-          print('Import OK — gpu_doctor version:', getattr(gpu_doctor, '__version__', 'n/a'))
+          print('Import OK -- gpu_doctor version:', getattr(gpu_doctor, '__version__', 'n/a'))
           "
 
       - name: CLI --json (no torch)
@@ -79,7 +79,7 @@ jobs:
           from gpu_doctor import device_info
           info = device_info()
           json_str = json.dumps(info)
-          print('device_info JSON OK — keys:', list(info.keys()))
+          print('device_info JSON OK -- keys:', list(info.keys()))
           "
 
   # Separate job: verify pyproject.toml builds cleanly

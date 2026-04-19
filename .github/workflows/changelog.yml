@@ -31,7 +31,7 @@ jobs:
 
           CHANGELOG = "CHANGELOG.md"
 
-          # ── 1. Find last commit that touched CHANGELOG.md ────────────────────
+          # -- 1. Find last commit that touched CHANGELOG.md --------------------
           result = subprocess.run(
               ["git", "log", "--follow", "--pretty=format:%H", "--", CHANGELOG],
               capture_output=True, text=True
@@ -44,7 +44,7 @@ jobs:
           else:
               log_range  = "HEAD~20..HEAD"
 
-          # ── 2. Get new commits ───────────────────────────────────────────────
+          # -- 2. Get new commits -----------------------------------------------
           result = subprocess.run(
               ["git", "log", log_range, "--pretty=format:%h|%ad|%s|%an", "--date=short"],
               capture_output=True, text=True
@@ -55,7 +55,7 @@ jobs:
               print("No new commits to add to CHANGELOG.")
               sys.exit(0)
 
-          # ── 3. Categorise commits ────────────────────────────────────────────
+          # -- 3. Categorise commits --------------------------------------------
           CATEGORIES = {
               "feat":     ("### Added",   []),
               "fix":      ("### Fixed",   []),
@@ -77,12 +77,12 @@ jobs:
               key = m.group(1) if m else "other"
               body = re.sub(r'^(feat|fix|docs|chore|refactor|perf|test)(\([^)]+\))?!?:\s*', '', subject)
               scope_match = re.match(r'^(?:feat|fix|docs|chore|refactor|perf|test)\(([^)]+)\)', subject)
-              scope = f"**{scope_match.group(1)}** — " if scope_match else ""
+              scope = f"**{scope_match.group(1)}** -- " if scope_match else ""
               buckets[key].append(f"- {scope}{body} (`{sha}`)")
 
-          # ── 4. Build [Unreleased] block ──────────────────────────────────────
+          # -- 4. Build [Unreleased] block --------------------------------------
           today = datetime.date.today().isoformat()
-          section_lines = [f"## [Unreleased] — updated {today}", ""]
+          section_lines = [f"## [Unreleased] -- updated {today}", ""]
 
           for key, (header, _) in CATEGORIES.items():
               entries = buckets[key]
@@ -93,7 +93,7 @@ jobs:
 
           section_lines.append("")
 
-          # ── 5. Inject into CHANGELOG.md ──────────────────────────────────────
+          # -- 5. Inject into CHANGELOG.md --------------------------------------
           with open(CHANGELOG, "r") as f:
               content = f.read()
 
