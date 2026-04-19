@@ -8,8 +8,8 @@ Auto-updated by GitHub Actions on every push to `main`.
 
 ## [Unreleased] -- updated 2026-04-19
 
-### Changed
-- add Buy Me A Coffee link to README (`63b34e2`)
+### Fixed
+- correct Buy Me a Coffee link to buymeacoffee.com/chharith (`3e06dc0`)
 
 
 ## [1.0.0] — 2026-03-28
